@@ -1,0 +1,60 @@
+<html>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+    <body>
+        <canvas id="can" width="112" height="112"></canvas>
+        <img id="canvasimg" style="position:absolute;top:10%;left:52%;" style="display:none;">
+        <canvas id="smallcan" width="28" height="28" style="position:absolute;top:20%;left:52%;"></canvas>
+        <input type="button" value="Predict" id="btn" size="30" onclick="save()">
+        <input type="button" value="clear" id="clr" size="23" onclick="erase()">
+        <p id="output"></p>
+        <script>
+            var canvas = document.querySelector("#can");
+            var signaturePad = new SignaturePad(canvas, {
+                penColor: "white", 
+                dotSize: 7,
+                minWidth: 7,
+                maxWidth: 9,
+                backgroundColor: "black"
+            });
+
+            function erase() {
+                signaturePad.clear();
+            }
+            
+            function save() {
+                document.getElementById("canvasimg").style.border = "2px solid";
+                var dataURL = canvas.toDataURL("image/jpeg");
+                //document.getElementById("canvasimg").src = dataURL;
+                document.getElementById("canvasimg").style.display = "inline";
+
+                smallCanvas = document.getElementById('smallcan');
+                smallCtx = smallCanvas.getContext("2d");
+
+                const targetSize = 28
+                smallCtx.clearRect(0, 0, targetSize, targetSize);
+                smallCtx.drawImage(canvas, 0, 0, targetSize, targetSize);
+
+                var dataURLSmall = smallCanvas.toDataURL("image/jpeg");
+                document.getElementById("canvasimg").src = dataURLSmall;
+
+                // API anzapfen
+                let formData = new FormData();
+                formData.append('image', dataURLSmall);
+
+                //fetch('http://timpo28.pythonanywhere.com/classify', {
+                fetch('get-prediction.php', {
+                    method: 'POST', 
+                    mode: 'cors',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector("#output").innerHTML = "Prediction: " + data.prediction;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+        </script>
+    </body>
+</html>
