@@ -1,19 +1,36 @@
+<!DOCTYPE html>
 <html>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Digit Classifier based on mnist</title>
+        <link rel="stylesheet" href="css/milligram.min.css" />
+        <link rel="stylesheet" href="css/style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+    </head>
     <body>
-        <canvas id="can" width="112" height="112"></canvas>
-        <img id="canvasimg" style="position:absolute;top:10%;left:52%;" style="display:none;">
-        <canvas id="smallcan" width="28" height="28" style="position:absolute;top:20%;left:52%;"></canvas>
-        <input type="button" value="Predict" id="btn" size="30" onclick="save()">
-        <input type="button" value="clear" id="clr" size="23" onclick="erase()">
-        <p id="output"></p>
+        <div class="container">
+            <h1>Digit Classifier</h1>
+            <div class="row">
+                <div class="column column-33">
+                    <canvas id="can" class="d-block" width="224" height="224"></canvas>
+                </div>
+                <div class="column">
+                    <input type="button" class="d-block" value="Predict" id="btn" size="30" onclick="save()">
+                    <input type="button" class="d-block" value="clear" id="clr" size="23" onclick="erase()">
+                </div>
+            </div>
+            <img id="canvasimg" style="display:none;">
+            <canvas id="smallcan" width="28" height="28"></canvas>
+            <p id="output"></p>
+        </div>
         <script>
             var canvas = document.querySelector("#can");
             var signaturePad = new SignaturePad(canvas, {
                 penColor: "white", 
-                dotSize: 7,
-                minWidth: 7,
-                maxWidth: 9,
+                dotSize: 14,
+                minWidth: 14,
+                maxWidth: 17,
                 backgroundColor: "black"
             });
 

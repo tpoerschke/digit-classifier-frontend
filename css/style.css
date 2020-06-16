@@ -1,0 +1,7 @@
+.container {
+    max-width: 80rem;
+}
+
+.d-block {
+    display: block !important;
+}
