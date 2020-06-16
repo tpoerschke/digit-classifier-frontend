@@ -16,13 +16,19 @@
                     <canvas id="can" class="d-block" width="224" height="224"></canvas>
                 </div>
                 <div class="column">
-                    <input type="button" class="d-block" value="Predict" id="btn" size="30" onclick="save()">
-                    <input type="button" class="d-block" value="clear" id="clr" size="23" onclick="erase()">
+                    <button class="d-block" id="btn" size="30" onclick="save()">Los!</button>
+                    <button class="d-block button-outline" id="clr" size="23" onclick="erase()">Zurücksetzen</button>
+                    <p class="helptext">
+                        <strong>Wie funktioniert's?</strong><br>
+                        Male eine Zahl in das schwarze Quadrat und drücke anschließend auf "Los!".
+                    </p>
                 </div>
             </div>
-            <img id="canvasimg" style="display:none;">
             <canvas id="smallcan" width="28" height="28"></canvas>
-            <p id="output"></p>
+            <div class="container output-container">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                <p id="output"></p>
+            </div>
         </div>
         <script>
             var canvas = document.querySelector("#can");
@@ -39,10 +45,7 @@
             }
             
             function save() {
-                document.getElementById("canvasimg").style.border = "2px solid";
                 var dataURL = canvas.toDataURL("image/jpeg");
-                //document.getElementById("canvasimg").src = dataURL;
-                document.getElementById("canvasimg").style.display = "inline";
 
                 smallCanvas = document.getElementById('smallcan');
                 smallCtx = smallCanvas.getContext("2d");
@@ -52,7 +55,6 @@
                 smallCtx.drawImage(canvas, 0, 0, targetSize, targetSize);
 
                 var dataURLSmall = smallCanvas.toDataURL("image/jpeg");
-                document.getElementById("canvasimg").src = dataURLSmall;
 
                 // API anzapfen
                 let formData = new FormData();
