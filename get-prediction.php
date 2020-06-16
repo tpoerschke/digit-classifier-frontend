@@ -15,6 +15,14 @@ if(!is_dir($imagesDir)) {
 }
 
 $filename = $imagesDir ."/image". date("Y-m-d_His") .".jpeg";
+
+// Vor dem Speichern muss überprüft werden, ob das Bild valide ist,
+// damit es nicht dazu kommt, dass schädliche Dateien gespeichert werden
+$im = @imagecreatefromstring(base64_decode($data));
+$valid = ($im != FALSE);
+if(!$valid) die("No valid image!");
+imagedestroy($im);
+
 file_put_contents($filename, base64_decode($data));
 
 $url = 'http://timpo28.pythonanywhere.com/classify';
