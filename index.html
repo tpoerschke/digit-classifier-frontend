@@ -13,10 +13,11 @@
             <h1>Digit Classifier</h1>
             <div class="row">
                 <div class="column column-33">
-                    <canvas id="can" class="d-block" width="224" height="224"></canvas>
+                    <canvas id="maincanvas" class="d-block" width="224" height="224"></canvas>
+                    <span class="small-image-desc">Bild verkleinert: </span><canvas id="smallcanvas" width="28" height="28"></canvas>
                 </div>
                 <div class="column">
-                    <button class="d-block" id="btn" size="30" onclick="save()">Los!</button>
+                    <button class="d-block" id="btn" size="30" onclick="send()">Los!</button>
                     <button class="d-block button-outline" id="clr" size="23" onclick="erase()">Zurücksetzen</button>
                     <p class="helptext">
                         <strong>Wie funktioniert's?</strong><br>
@@ -24,15 +25,15 @@
                     </p>
                 </div>
             </div>
-            <canvas id="smallcan" width="28" height="28"></canvas>
             <div class="container output-container">
-                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                <p id="output"></p>
             </div>
         </div>
+        <template id="loading-template">
+            <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        </template>
         <script>
-            var canvas = document.querySelector("#can");
-            var signaturePad = new SignaturePad(canvas, {
+            const canvas = document.querySelector("#maincanvas");
+            const signaturePad = new SignaturePad(canvas, {
                 penColor: "white", 
                 dotSize: 14,
                 minWidth: 14,
@@ -40,27 +41,44 @@
                 backgroundColor: "black"
             });
 
+            const smallCanvas = document.querySelector("#smallcanvas");
+            const outputElement = document.querySelector(".output-container");
+
             function erase() {
                 signaturePad.clear();
             }
             
-            function save() {
-                var dataURL = canvas.toDataURL("image/jpeg");
-
-                smallCanvas = document.getElementById('smallcan');
-                smallCtx = smallCanvas.getContext("2d");
-
+            function processImage() {
                 const targetSize = 28
+
+                let dataURL = canvas.toDataURL("image/jpeg");
+
+                smallCtx = smallCanvas.getContext("2d");
                 smallCtx.clearRect(0, 0, targetSize, targetSize);
                 smallCtx.drawImage(canvas, 0, 0, targetSize, targetSize);
 
-                var dataURLSmall = smallCanvas.toDataURL("image/jpeg");
+                return smallCanvas.toDataURL("image/jpeg");
+            }
 
-                // API anzapfen
+            function send() {       
+                let dataURLSmall = processImage();
+
+                // Lade-Animation anzeigen und
+                // Output-Text löschen
+                let animation = document.querySelector("#loading-template").innerHTML;
+                outputElement.innerHTML = animation;
+                // Zur Ausgabe scrollen (für Smartphones)
+                const topPos = outputElement.getBoundingClientRect().top + window.pageYOffset;
+
+                window.scrollTo({
+                    top: topPos, 
+                    behavior: 'smooth' 
+                });
+
+                // API ansprechen
                 let formData = new FormData();
                 formData.append('image', dataURLSmall);
 
-                //fetch('http://timpo28.pythonanywhere.com/classify', {
                 fetch('get-prediction.php', {
                     method: 'POST', 
                     mode: 'cors',
@@ -68,7 +86,9 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    document.querySelector("#output").innerHTML = "Prediction: " + data.prediction;
+                    if(data.prediction) {
+                        outputElement.innerHTML = "<p class=\"prediction\">Vermutung: " + data.prediction + "</p>";
+                    }
                 })
                 .catch((error) => {
                     console.error('Error:', error);

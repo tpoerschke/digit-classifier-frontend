@@ -6,8 +6,26 @@
     display: block !important;
 }
 
+.small-image-desc {
+    position: relative;
+    top: -0.75rem;
+    font-size: 1rem;
+}
+
+/* Screens größer als Mobil */
+@media (min-width: 40.0rem) { 
+    .small-image-desc {
+        font-size: 1.5rem;
+    }
+}
+
 p.helptext {
     margin-top: 3rem;
+}
+
+p.prediction {
+    text-align: center;
+    font-size: 4rem;
 }
 
 
