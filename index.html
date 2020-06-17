@@ -25,8 +25,19 @@
                     </p>
                 </div>
             </div>
-            <div class="container output-container">
+            <div class="output-container">
             </div>
+        </div>
+        <hr>
+        <div class="container">
+            <p>
+                <strong>Datenschutz</strong><br>
+                Die gezeichneten Bilder werden auf dem Server gespeichert. Sie werden ausschließlich verwendet, um die Erkennungsrate zu steigen. 
+                Es wird lediglich das Bild gespeichert - keine weiteren Informationen.
+            </p>
+            <p>
+                <a href="http://coder-tim.de/impressum/">Impressum</a>
+            </p>
         </div>
         <template id="loading-template">
             <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
@@ -48,6 +59,40 @@
                 signaturePad.clear();
             }
             
+            function renderResult(data) {
+                if(data.prediction) {
+                    // Vermutung oben anzeigen
+                    outputElement.innerHTML = "<p class=\"prediction\">Vermutung: " + data.prediction + "</p>";
+                    // Darunter eine Liste mit den Prozentwerten
+                    for(let i = 0; i < data.percentages.length; i++) {
+                        const percentage = (Math.round(data.percentages[i] * 100 * 100) / 100) + "%";
+                        // Linke Spalte -> Klasse
+                        let colLeft = document.createElement("div");
+                        colLeft.style.fontFamily = "monospace";
+                        colLeft.classList.add("column", "column-20");
+                        colLeft.innerHTML = i + " - " + percentage;
+                        // Rechte Spalte -> Prozentwert
+                        let colRight = document.createElement("div");
+                        colRight.classList.add("column");
+                        
+                        let rangeDiv = document.createElement("div");
+                        rangeDiv.classList.add("range");
+
+                        let innerRange = document.createElement("span");
+                        innerRange.style.width = percentage;
+                        rangeDiv.appendChild(innerRange);
+
+                        colRight.appendChild(rangeDiv);
+
+                        // Die Spalten in eine Reihe einhängen
+                        let row = document.createElement("div");
+                        row.classList.add("row");
+                        row.append(colLeft, colRight);
+                        outputElement.appendChild(row);
+                    }
+                }
+            }
+
             function processImage() {
                 const targetSize = 28
 
@@ -86,9 +131,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if(data.prediction) {
-                        outputElement.innerHTML = "<p class=\"prediction\">Vermutung: " + data.prediction + "</p>";
-                    }
+                    renderResult(data);
                 })
                 .catch((error) => {
                     console.error('Error:', error);
